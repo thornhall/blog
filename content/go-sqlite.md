@@ -287,8 +287,8 @@ I removed some validation logic for security reasons, but here we handle what ha
 requests the stats of the application. The most important line is the following:
 
 ```go
-    stats, err := h.repo.IncrementViews(r.Context(), slug) // in HandleGetStats
-	stats, err := h.repo.IncrementLikes(r.Context(), slug) // in HandleLikes
+stats, err := h.repo.IncrementViews(r.Context(), slug) // in HandleGetStats
+stats, err := h.repo.IncrementLikes(r.Context(), slug) // in HandleLikes
 ```
 
 The handler calls the repo, incrementing the likes when the HandleLikes handler function is invoked, and when the user requests stats,
