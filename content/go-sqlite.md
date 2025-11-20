@@ -121,7 +121,7 @@ func NewServer(publicDir, domain string) *http.Server {
 }
 ```
 
-This is how we create a server. For our blog's purposes, we need to pass in a public directory sting and a domain.
+This is how we create a server. For our blog's purposes, we need to pass in a public directory string and a domain.
 The domain is its own topic that I won't dive into here. The public directory is just the path to the `public` directory,
 which we know from the file structure is `./public`. 
 
@@ -270,6 +270,7 @@ func (h *Handler) HandleLike(w http.ResponseWriter, r *http.Request) {
 	file, err := h.fs.Open(slug + ".html")
 	if err != nil {
 		HttpErrorResponse(w, "post not found", http.StatusNotFound)
+        return
 	}
 	file.Close()
 
