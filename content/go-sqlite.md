@@ -17,6 +17,12 @@ I had two requirements for my SSG:
 - Likes and Views are dynamic and persisted (when a user views a post, the views go up, same with likes)
 - I can write new posts in a simple markdown format
 
+## Why I Created This Blog
+You may have noticed that I already have a [blog](https://thornhall.github.io). Why create a new one?
+- That blog uses a template that I didn't make. I wanted more customization over the look and feel of the page.
+- The other blog also uses Jekyll + Github Pages. I wanted to write my own static site generator with Go. I also wanted to deploy the app myself.
+- I wanted dynamic likes and views, which is not straightforward with the Github Pages setup.
+
 ## The Tech Stack: Go + SQLite + HTML + JavaScript
 
 I wanted to keep my website as lightweight as possible, so I opted to use `SQLite`, an embedded database. What does that actually mean?
