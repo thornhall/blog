@@ -66,8 +66,9 @@ type Post struct {
 }
 
 type PageData struct {
-	Title string
-	Posts []Post
+	Title   string
+	Excerpt string
+	Posts   []Post
 }
 
 func main() {
@@ -131,8 +132,9 @@ func main() {
 	}
 
 	data := PageData{
-		Title: "blog.info()",
-		Posts: posts,
+		Title:   "blog.info()",
+		Excerpt: "Backend Engineer obsessed with simplicity and scalability.",
+		Posts:   posts,
 	}
 
 	tmplIndex, err := template.ParseFiles("templates/layout.html", "templates/index.html")
