@@ -1,0 +1,368 @@
+{{ define "content" }}
+
+<style>
+    /* ARTICLE WRAPPER */
+    .article-wrapper {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .article-container {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 50px;
+        position: relative;
+        overflow: hidden;
+
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* --- HEADER LAYOUT --- */
+    .article-header {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        margin-bottom: 50px;
+        padding-bottom: 30px;
+    }
+
+    .article-meta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* CENTERED */
+        gap: 12px;
+        color: var(--accent);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 700;
+        flex-wrap: wrap;
+    }
+
+    .article-title {
+        font-family: var(--font-display);
+        font-size: 3.5rem;
+        line-height: 1.05;
+        background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        hyphens: none;
+        text-align: center;
+        /* CENTERED */
+    }
+
+    /* Header Footer for the stats */
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        padding-top: 20px;
+        width: 100%;
+    }
+
+    .author-mini {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .author-mini img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+    }
+
+    /* --- NEW STATS AREA --- */
+    .stats-group {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        /* Spacing between Views and Like Button */
+    }
+
+    /* View Counter (Professional Look) */
+    .view-counter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-family: var(--font-display);
+    }
+
+    .view-counter svg {
+        width: 18px;
+        height: 18px;
+        opacity: 0.6;
+    }
+
+    /* Like Button (Distinct Interactive Element) */
+    .like-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        padding: 8px 16px;
+        color: var(--text-main);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .like-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--accent);
+        transform: translateY(-1px);
+    }
+
+    .like-btn svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        stroke-width: 2px;
+        fill: transparent;
+        transition: fill 0.2s ease;
+    }
+
+    /* Clicked State */
+    .like-btn.liked {
+        border-color: #ef4444;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .like-btn.liked svg {
+        fill: #ef4444;
+        stroke: #ef4444;
+    }
+
+    /* --- TYPOGRAPHY --- */
+    .prose {
+        color: #d4d4d8;
+        font-size: 1.15rem;
+        line-height: 1.9;
+        width: 100%;
+    }
+
+    .prose p {
+        margin-bottom: 2em;
+    }
+
+    .prose img,
+    .prose video,
+    .prose iframe {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .prose h2 {
+        color: var(--text-main);
+        font-family: var(--font-display);
+        font-size: 2rem;
+        margin-top: 2.5em;
+        margin-bottom: 1em;
+        border-left: 4px solid var(--accent);
+        padding-left: 15px;
+        word-wrap: break-word;
+    }
+
+    .prose code {
+        background: rgba(91, 91, 91, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        color: var(--accent);
+        font-size: 0.9em;
+        border: 1px solid rgba(41, 41, 41, 0.2);
+        word-break: break-all;
+    }
+
+    .prose pre {
+        background: #0e0e10;
+        padding: 25px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        margin: 2em 0;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-width: 100%;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    .prose pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+        border: none;
+        word-break: normal;
+    }
+
+    .prose blockquote {
+        font-family: var(--font-display);
+        font-size: 1.4rem;
+        font-style: italic;
+        color: var(--text-main);
+        margin: 3em 0;
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 40px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: 0.2s;
+        opacity: 0.6;
+    }
+
+    .back-link:hover {
+        opacity: 1;
+        color: var(--accent);
+        transform: translateX(-4px);
+    }
+
+    .article-footer {
+        margin-top: 80px;
+        text-align: center;
+    }
+
+    .footer-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border), transparent);
+        margin-bottom: 40px;
+        width: 100%;
+    }
+
+    .footer-home-link {
+        display: inline-block;
+        padding: 12px 30px;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .footer-home-link:hover {
+        border-color: var(--accent);
+        color: var(--text-main);
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (max-width: 768px) {
+        .article-title {
+            font-size: 2.2rem;
+        }
+
+        .article-container {
+            padding: 20px;
+        }
+
+        .header-actions {
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stats-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .prose pre {
+            padding: 15px;
+        }
+    }
+
+    @media (min-width: 900px) {
+        .sidebar {
+            margin-top: 64px;
+        }
+    }
+</style>
+
+<div class="article-wrapper">
+    <!-- Top Back Link -->
+    <a href="/" class="back-link">← Back to Logs</a>
+
+    <article class="article-container">
+        <header class="article-header">
+            <div class="article-meta">
+                <span>{{ .Category }}</span>
+                <span>•</span>
+                <span>{{ .Date }}</span>
+            </div>
+
+            <h1 class="article-title">{{ .Title }}</h1>
+
+            <div class="header-actions">
+                <div class="author-mini">
+                    <img src="/assets/thornphoto.jpg" alt="Author">
+                    <span>Thorn Hall</span>
+                </div>
+
+                <div class="stats-group">
+                    <div class="view-counter">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span id="views-{{ .Slug }}">{{ .Views }}</span>
+                    </div>
+
+                    <button class="like-btn" onclick="handleLike('{{ .Slug }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path
+                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                            </path>
+                        </svg>
+                        <span id="likes-{{ .Slug }}">{{ .Likes }}</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="prose">
+            {{ .Body }}
+        </div>
+
+        <!-- NEW FOOTER SECTION -->
+        <footer class="article-footer">
+            <div class="footer-divider"></div>
+            <a href="/" class="footer-home-link">
+                ← Return to Home
+            </a>
+        </footer>
+    </article>
+</div>
+
+{{ end }}

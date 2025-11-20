@@ -1,0 +1,48 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.3' # Use your version
+
+      # 1. Run your Static Site Generator
+      - name: Build Static Site
+        run: go run cmd/builder/main.go
+
+      # 2. Cross-Compile the Server for Linux (VPS)
+      - name: Compile Server Binary
+        run: GOOS=linux GOARCH=amd64 go build -o myblog cmd/server/main.go
+
+      # 3. Setup SSH Key
+      # We add the private key to the runner's SSH agent so we can log in
+      - name: Configure SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add Host Key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
+
+      # 4. Copy Files to Server (SCP)
+      # We copy the binary, the generated public folder, and assets
+      - name: Copy Files to VPS
+        run: |
+          scp -r myblog public assets ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/root/
+
+      # 5. Restart the Service
+      - name: Restart Service
+        run: |
+          ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} "systemctl restart myblog"

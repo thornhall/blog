@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Obsidian Log</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-depth: #0a0a0c;
+            --bg-surface: #161618;
+            --bg-card: #1f1f22;
+            --border: #2e2e32;
+            --text-main: #ededed;
+            --text-muted: #a1a1aa;
+            --accent: #59f4ff;
+            --accent-glow: rgba(31, 83, 151, 0.15);
+            --gradient: linear-gradient(135deg, #59f4ff 0%, #ffffff 100%);
+            --font-display: "Roboto Mono", monospace;
+            --font-body: "Roboto Mono", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-depth);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: 9999;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.2s;
+        }
+
+        .layout {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: 1fr 240px;
+            gap: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        header {
+            padding: 25px 20px 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- FIXED BRAND CSS --- */
+        .brand {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .nav-links a {
+            margin-left: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        /* --- CARD STYLES --- */
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .post-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+            transform: translateZ(0);
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px) translateZ(0);
+            box-shadow: 0 20px 40px -10px black;
+            border-color: rgba(89, 244, 255, 0.5);
+        }
+
+        .post-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.06), transparent 40%);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        .post-card:hover::after {
+            opacity: 1;
+        }
+
+        .post-meta {
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .post-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+
+        .post-excerpt {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 25px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .read-btn {
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .read-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .read-btn::after {
+            content: "→";
+            transition: transform 0.2s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .post-card:hover .read-btn::after {
+            transform: translateX(4px);
+        }
+
+        /* --- SHARED STATS STYLES --- */
+        .stats-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .view-counter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: var(--font-display);
+            font-weight: 500;
+        }
+
+        .view-counter svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+        }
+
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 6px 14px;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .like-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .like-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2px;
+            fill: transparent;
+            transition: fill 0.2s ease;
+        }
+
+        /* Active/Liked State */
+        .like-btn.liked {
+            border-color: #ef4444;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .like-btn.liked svg {
+            fill: #ef4444;
+            stroke: #ef4444;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: sticky;
+            top: 40px;
+            height: fit-content;
+        }
+
+        .author-card {
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-surface) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .author-img-wrapper {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .author-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--bg-depth);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .author-name {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .author-bio {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .social-links a {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-depth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+        }
+
+        .social-links a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="brand">THORN HALL.</div>
+        <nav class="nav-links">
+            <a href="/">Articles</a>
+            <a href="/about">About</a>
+        </nav>
+    </header>
+
+    <div class="layout">
+        {{ template "content" . }}
+
+        <aside class="sidebar">
+            <div class="author-card">
+                <div class="author-img-wrapper">
+                    <!-- Updated Path matches your folder structure -->
+                    <img src="/assets/thornphoto.jpg" alt="Author" class="author-img">
+                </div>
+                <h3 class="author-name">Thorn Hall</h3>
+                <p class="author-bio">
+                    Backend Engineer & Go Enthusiast. Building scalable systems.
+                </p>
+                <div class="social-links">
+                    <a href="https://github.com/thornhall">Gh</a>
+                    <a href="https://www.linkedin.com/in/thorn-hall/">In</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Mouse Hover Effect for Cards
+            const container = document.getElementById("cards-container");
+            if (container) {
+                container.onmousemove = e => {
+                    for (const card of document.getElementsByClassName("post-card")) {
+                        const rect = card.getBoundingClientRect(),
+                            x = e.clientX - rect.left,
+                            y = e.clientY - rect.top;
+                        card.style.setProperty("--mouse-x", `${x}px`);
+                        card.style.setProperty("--mouse-y", `${y}px`);
+                    };
+                }
+            }
+
+            // --- CLIENT SIDE HYDRATION ---
+            const viewElements = document.querySelectorAll('[id^="views-"]');
+
+            viewElements.forEach(el => {
+                const slug = el.id.replace('views-', '');
+
+                // 1. Check LocalStorage for Heart State
+                const isLiked = localStorage.getItem(`liked_${slug}`);
+                if (isLiked) {
+                    const btn = document.querySelector(`button[onclick="handleLike('${slug}')"]`);
+                    if (btn) btn.classList.add('liked');
+                }
+
+                // 2. Fetch Fresh Stats (With Throttle)
+                fetchStats(slug);
+            });
+        });
+
+        async function fetchStats(slug) {
+            const CACHE_KEY = `stats_cache_${slug}`;
+            const COOLDOWN = 60000; // 1 Minute
+            const now = Date.now();
+
+            // A. Check Cache Validity
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (now - data.timestamp < COOLDOWN) {
+                    updateStatsUI(slug, data.views, data.likes);
+                    return;
+                }
+            }
+
+            // B. Fetch Fresh from API
+            try {
+                const res = await fetch(`/api/stats/${slug}`);
+                if (!res.ok) return;
+                const data = await res.json();
+
+                updateStatsUI(slug, data.views_count, data.likes_count);
+
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                    views: data.views_count,
+                    likes: data.likes_count,
+                    timestamp: now
+                }));
+
+            } catch (e) {
+                console.error("Failed to hydrate stats", e);
+            }
+        }
+
+        function updateStatsUI(slug, views, likes) {
+            const viewEl = document.getElementById(`views-${slug}`);
+            const likeEl = document.getElementById(`likes-${slug}`);
+            if (viewEl) viewEl.innerText = views;
+            if (likeEl) likeEl.innerText = likes;
+        }
+
+        async function handleLike(slug) {
+            if (localStorage.getItem(`liked_${slug}`)) return;
+
+            try {
+                const btn = document.querySelector(`button[onclick="handleLike('${slug}')"]`);
+                const countSpan = document.getElementById(`likes-${slug}`);
+
+                let current = parseInt(countSpan.innerText.replace(/,/g, ''));
+                countSpan.innerText = current + 1;
+                btn.classList.add('liked');
+
+                localStorage.setItem(`liked_${slug}`, "true");
+
+                const res = await fetch(`/api/like/${slug}`, { method: 'POST' });
+                if (!res.ok) throw new Error("Failed");
+
+                const data = await res.json();
+                countSpan.innerText = data.likes_count;
+
+                const CACHE_KEY = `stats_cache_${slug}`;
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                    views: data.views_count,
+                    likes: data.likes_count,
+                    timestamp: Date.now()
+                }));
+
+            } catch (e) {
+                console.error("Like failed", e);
+            }
+        }
+    </script>
+</body>
+
+</html>
