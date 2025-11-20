@@ -86,7 +86,6 @@ func main() {
 		goldmark.WithRendererOptions(),
 	)
 
-	// 2. Read all .md files from the content folder
 	files, err := os.ReadDir("./content")
 	if err != nil {
 		log.Fatal("Could not read content directory:", err)
@@ -99,23 +98,19 @@ func main() {
 			continue
 		}
 
-		// Read the file content
 		source, err := os.ReadFile("./content/" + file.Name())
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// 3. Convert Markdown to HTML & Extract Meta
 		var buf bytes.Buffer
 		context := parser.NewContext()
 		if err := md.Convert(source, &buf, parser.WithContext(context)); err != nil {
 			log.Fatal(err)
 		}
 
-		// Extract Metadata (Frontmatter)
 		metaData := meta.Get(context)
 
-		// Helper to safely get string values from the map
 		getString := func(key string) string {
 			if v, ok := metaData[key]; ok {
 				return fmt.Sprintf("%v", v)
@@ -129,15 +124,14 @@ func main() {
 			Date:     getString("date"),
 			Category: getString("category"),
 			Excerpt:  getString("excerpt"),
-			Body:     template.HTML(buf.String()), // The converted HTML
+			Body:     template.HTML(buf.String()),
 		}
 
 		posts = append(posts, p)
 	}
 
-	// 4. Prepare Templates
 	data := PageData{
-		Title: "The Obsidian Log",
+		Title: "blog.info()",
 		Posts: posts,
 	}
 
@@ -151,7 +145,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// 5. Build Index Page
 	f, err := os.Create("public/index.html")
 	if err != nil {
 		log.Fatal(err)
@@ -162,7 +155,6 @@ func main() {
 	f.Close()
 	log.Println("Generated: public/index.html")
 
-	// 6. Build Article Pages
 	for _, post := range posts {
 		filename := "public/" + post.Slug + ".html"
 		f, err := os.Create(filename)

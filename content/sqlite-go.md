@@ -182,7 +182,7 @@ func main() {
 
 	// 4. Prepare Templates
 	data := PageData{
-		Title: "The Obsidian Log",
+		Title: "blog.info()",
 		Posts: posts,
 	}
 
