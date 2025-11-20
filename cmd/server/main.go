@@ -26,6 +26,10 @@ func NewServer(publicDir, domain string) *http.Server {
 	hnd := handler.New(rep, logger, publicDir)
 	mux := router.New(hnd, logger, publicDir)
 
+	if _, err := database.Exec("PRAGMA journal_mode=WAL;"); err != nil {
+		logger.Error("failed to enable WAL mode", "error", err)
+	}
+
 	if domain != "" {
 		logger.Info("configuring production server (HTTPS)", "domain", domain)
 
