@@ -28,6 +28,7 @@ go.work.sum
 .env
 *.db
 .DS_Store
+public/*.html
 
 # Editor/IDE
 # .idea/
