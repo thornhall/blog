@@ -1,0 +1,235 @@
+{{ define "content" }}
+
+<style>
+    .about-wrapper {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 60px;
+        align-items: center;
+        margin-bottom: 100px;
+    }
+
+    .hero-content h1 {
+        font-family: var(--font-display);
+        font-size: 3.5rem;
+        line-height: 1.1;
+        margin-bottom: 25px;
+        background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-content .subtitle {
+        font-size: 1.2rem;
+        color: var(--accent);
+        font-weight: 500;
+        margin-bottom: 20px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .hero-content p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 30px;
+    }
+
+    .hero-img-container {
+        position: relative;
+    }
+
+    .hero-img {
+        width: 100%;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        box-shadow: 0 0 40px -10px var(--accent-glow);
+        transition: transform 0.3s ease;
+    }
+
+    .hero-img:hover {
+        transform: translateY(-5px);
+    }
+
+    .section-title {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        margin-bottom: 40px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 15px;
+        color: var(--text-main);
+    }
+
+    .stack-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 100px;
+    }
+
+    .stack-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stack-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .stack-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        color: var(--text-main);
+    }
+
+    .stack-card p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+        border-left: 2px solid var(--border);
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 50px;
+    }
+
+    .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -36px;
+        top: 5px;
+        width: 10px;
+        height: 10px;
+        background: var(--bg-depth);
+        border: 2px solid var(--accent);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .timeline-date {
+        font-family: var(--font-display);
+        color: var(--accent);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .timeline-role {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 5px;
+    }
+
+    .timeline-company {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+    }
+
+    @media (max-width: 800px) {
+        .hero {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 40px;
+        }
+
+        .hero-img {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<div class="about-wrapper">
+    <section class="hero">
+        <div class="hero-content">
+            <span class="subtitle">Backend Engineer</span>
+            <h1>Building Simple, Scalable Systems.</h1>
+            <p>
+                I'm Thorn Hall, a software engineer obsessed with scalability and simplicity. I'm an expert communicator
+                and collaborator. Lately, I've been obsessed with Go. I have extensive experience with Python, Lua, and
+                TypeScript. I've been developing a MMORPG in Roblox using Lua since January 2025.
+            </p>
+        </div>
+        <div class="hero-img-container">
+            <img src="/assets/thornphoto.jpg" alt="Thorn Hall" class="hero-img">
+        </div>
+    </section>
+
+    <h2 class="section-title">Core Technologies</h2>
+    <div class="stack-grid">
+        <div class="stack-card">
+            <h3>Go (Golang)</h3>
+            <p>High-performance backend services and tooling.</p>
+        </div>
+        <div class="stack-card">
+            <h3>PostgreSQL</h3>
+            <p>Data schemas, optimization, and operations.</p>
+        </div>
+        <div class="stack-card">
+            <h3>Docker & K8s</h3>
+            <p>Containerization and orchestration at scale.</p>
+        </div>
+        <div class="stack-card">
+            <h3>Python</h3>
+            <p>Django services and tooling.</p>
+        </div>
+    </div>
+
+    <h2 class="section-title">Journey</h2>
+    <div class="timeline">
+        <div class="timeline-item">
+            <span class="timeline-date">2023 - 2024</span>
+            <div class="timeline-role">Senior Software Engineer</div>
+            <div class="timeline-company">Shippo</div>
+            <p style="color: var(--text-muted);">
+                As a Senior Software Engineer, I was responsible for Labels, Manifests, and Refunds APIs used by Shippo
+                customers.
+                Labels are the core product that Shippo offers. During my time in this role, I built pipelines
+                responsible for
+                billions of dollars in reconciliation and reporting, advanced alerting for critical systems, and
+                reliability infrastructure
+                such as a circuit breaker for our most active API integration. I also optimized our main CICD pipeline
+                to reduce its runtime by 66%.
+            </p>
+        </div>
+
+        <div class="timeline-item">
+            <span class="timeline-date">2019 - 2023</span>
+            <div class="timeline-role">Software Engineer</div>
+            <div class="timeline-company">Shippo</div>
+            <p style="color: var(--text-muted);">
+                As a Software Engineer, I was responsible for maintaining the 100+ API integrations Shippo has with
+                carriers.
+                I introduced new carrier integrations unlocking millions in revenue. I wrote internal tooling to migrate
+                customer accounts.
+                I also worked on core infrastructure for local rating, developing major parts of an engine for automated
+                updates for millions
+                of rates.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+{{ end }}

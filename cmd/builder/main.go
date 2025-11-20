@@ -174,4 +174,24 @@ func main() {
 		f.Close()
 		log.Println("Generated:", filePath)
 	}
+
+	tmplAbout, err := template.ParseFiles("templates/layout.html", "templates/about.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := os.MkdirAll("public/about", 0755); err != nil {
+		log.Fatal(err)
+	}
+
+	fAbout, err := os.Create("public/about/index.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer fAbout.Close()
+
+	if err := tmplAbout.Execute(fAbout, data); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Generated: public/about/index.html")
 }
