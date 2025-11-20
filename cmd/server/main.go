@@ -24,7 +24,7 @@ func NewServer(publicDir, domain string) *http.Server {
 	database := db.New()
 	rep := repo.New(database)
 	hnd := handler.New(rep, logger, publicDir)
-	mux := router.New(hnd, publicDir)
+	mux := router.New(hnd, logger, publicDir)
 
 	if domain != "" {
 		logger.Info("configuring production server (HTTPS)", "domain", domain)

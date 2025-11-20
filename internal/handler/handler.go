@@ -69,12 +69,6 @@ func (h *Handler) HandleLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, err := h.fs.Open(slug + ".html")
-	if err != nil {
-		HttpErrorResponse(w, "post not found", http.StatusNotFound)
-	}
-	file.Close()
-
 	stats, err := h.repo.IncrementLikes(r.Context(), slug)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
