@@ -359,7 +359,7 @@ func (r *Repo) GetStats(ctx context.Context, slug string) (Stats, error) {
 I didn't want to share every line of code of the app for the sake of brevity, but that really covers 90% of what powers this app. However, there's
 a key component I've completely skipped: The static site generation.
 
-# Static Site Generation
+## Static Site Generation
 Up to this point, I've only talked about how the app serves the _already-generated_ HTML files. How do we generate those in the first place? I won't show all the code here for brevity, but the flow for generating a post looks like this:
 
 - Grab the Post template from the `templates` directory.
@@ -368,5 +368,5 @@ Up to this point, I've only talked about how the app serves the _already-generat
 The template is actually HTML, CSS, and a little bit of JavaScript. In it, we use delimeters to specify where to render the post content on the page.
 These delimeters tell the templating engine exactly how to "merge" our template with our actual post.
 
-# Conclusion
+## Conclusion
 That's it. That's most of the app. The question of "how is it deployed" I will leave for another time. I had a blast making this app. In the future I plan to write about projects I've worked on. I'm going to go in-depth about the Grand Exchange clone I built next.
