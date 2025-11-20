@@ -21,6 +21,8 @@
             --accent: #59f4ff;
             --accent-glow: rgba(31, 83, 151, 0.15);
             --gradient: linear-gradient(135deg, #59f4ff 0%, #ffffff 100%);
+
+            /* Font Mapping */
             --font-display: "Roboto Mono", monospace;
             --font-body: "Roboto Mono", monospace;
         }
@@ -31,14 +33,23 @@
             padding: 0;
         }
 
+        /* --- FIX 1: STRICT OVERFLOW CONTROL --- */
+        html,
+        body {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            /* Kills horizontal scroll */
+        }
+
         body {
             background-color: var(--bg-depth);
             color: var(--text-main);
             font-family: var(--font-body);
             line-height: 1.6;
-            overflow-x: hidden;
         }
 
+        /* Noise Texture */
         body::before {
             content: "";
             position: fixed;
@@ -58,6 +69,7 @@
             transition: 0.2s;
         }
 
+        /* --- FIX 2: LAYOUT PADDING & GRID --- */
         .layout {
             max-width: 1400px;
             margin: 0 auto;
@@ -65,14 +77,11 @@
             display: grid;
             grid-template-columns: 1fr 240px;
             gap: 40px;
+            width: 100%;
+            /* Ensure it stays within bounds */
         }
 
-        @media (max-width: 900px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
+        /* --- FIX 3: HEADER WRAPPING --- */
         header {
             padding: 25px 20px 30px;
             max-width: 1400px;
@@ -82,9 +91,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            /* Allow nav to drop below logo on tiny screens */
+            gap: 20px;
+            /* Space between logo and nav if they wrap */
         }
 
-        /* --- FIXED BRAND CSS --- */
         .brand {
             font-family: var(--font-display);
             font-size: 2rem;
@@ -95,6 +107,14 @@
             -webkit-text-fill-color: transparent;
             color: transparent;
             letter-spacing: -1px;
+            white-space: nowrap;
+            /* Prevent logo from breaking awkwardly */
+        }
+
+        .nav-links {
+            display: flex;
+            /* Ensure links stay together */
+            flex-wrap: wrap;
         }
 
         .nav-links a {
@@ -115,6 +135,7 @@
             display: flex;
             flex-direction: column;
             gap: 40px;
+            width: 100%;
         }
 
         .post-card {
@@ -167,6 +188,8 @@
             font-weight: 700;
             margin-bottom: 15px;
             line-height: 1.1;
+            hyphens: auto;
+            /* Help break long words in titles */
         }
 
         .post-excerpt {
@@ -186,6 +209,9 @@
             align-items: center;
             border-top: 1px solid var(--border);
             padding-top: 20px;
+            flex-wrap: wrap;
+            /* Allow footer items to wrap if tight */
+            gap: 15px;
         }
 
         .read-btn {
@@ -349,6 +375,34 @@
             border-color: var(--accent);
             color: var(--accent);
         }
+
+        /* --- FIX 4: MOBILE RESPONSIVENESS --- */
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+                /* Sidebar stacks below */
+                padding: 40px 15px;
+                /* Slightly less padding to give content room */
+            }
+
+            header {
+                justify-content: center;
+                /* Center items when wrapped */
+                text-align: center;
+            }
+
+            .nav-links {
+                margin-left: 0;
+                /* Reset margin since we might wrap */
+                justify-content: center;
+                width: 100%;
+            }
+
+            .nav-links a {
+                margin: 0 10px;
+                /* Even spacing */
+            }
+        }
     </style>
 </head>
 
@@ -368,7 +422,6 @@
         <aside class="sidebar">
             <div class="author-card">
                 <div class="author-img-wrapper">
-                    <!-- Updated Path matches your folder structure -->
                     <img src="/assets/thornphoto.jpg" alt="Author" class="author-img">
                 </div>
                 <h3 class="author-name">Thorn Hall</h3>
@@ -376,8 +429,9 @@
                     Backend Engineer & Go Enthusiast. Building scalable systems.
                 </p>
                 <div class="social-links">
-                    <a href="https://github.com/thornhall">Gh</a>
-                    <a href="https://www.linkedin.com/in/thorn-hall/">In</a>
+                    <a href="#">𝕏</a>
+                    <a href="#">Gh</a>
+                    <a href="#">In</a>
                 </div>
             </div>
         </aside>

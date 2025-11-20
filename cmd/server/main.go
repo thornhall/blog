@@ -77,7 +77,7 @@ func main() {
 			err = srv.ListenAndServe()
 		}
 
-		if !errors.Is(http.ErrServerClosed, err) {
+		if !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("unable to start http server: %v", err)
 		}
 	}()
