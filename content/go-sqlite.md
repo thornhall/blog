@@ -41,7 +41,7 @@ type Stats struct {
 ```
 
 Slug is an extremely nasty word, but for some reason that's what we call the bit of the article that goes in the URL. For example, this site is
-`https://thorn.sh/go-sqlite/. In this case, the `go-sqlite` is the slug.
+`https://thorn.sh/go-sqlite/. In this case, the go-sqlite is the slug.
 
 By the way, the syntax highlighting you're seeing in the code snippet? It's also server rendered, using my own custom syntax highlighting theme :)
 
