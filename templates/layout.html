@@ -525,7 +525,7 @@
 
                 localStorage.setItem(`liked_${slug}`, "true");
 
-                const res = await fetch(`/api/like/${slug}`, { method: 'POST' });
+                const res = await fetch(`/api/likes/${slug}`, { method: 'POST' });
                 if (!res.ok) throw new Error("Failed");
 
                 const data = await res.json();
