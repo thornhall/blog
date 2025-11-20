@@ -37,13 +37,25 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
 
-      # 4. Copy Files to Server (SCP)
-      # We copy the binary, the generated public folder, and assets
+      # 4. Deploy Files (Atomic Method)
       - name: Copy Files to VPS
         run: |
-          scp -r myblog public assets ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/root/
+          # 1. Upload binary to a temporary name (bypasses "Text file busy" error)
+          scp myblog ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/root/myblog.new
+          
+          # 2. Upload static files (these can simply overwrite)
+          scp -r public assets ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/root/
 
-      # 5. Restart the Service
-      - name: Restart Service
+      # 5. Atomic Swap & Restart
+      - name: Swap and Restart
         run: |
-          ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} "systemctl restart myblog"
+          ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} "
+            # Replace the running binary atomically
+            mv /root/myblog.new /root/myblog
+            
+            # Make sure it's executable
+            chmod +x /root/myblog
+            
+            # Restart the service to load the new binary
+            systemctl restart myblog
+          "
