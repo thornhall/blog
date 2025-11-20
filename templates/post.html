@@ -18,7 +18,6 @@
         overflow-wrap: break-word;
     }
 
-    /* --- HEADER LAYOUT --- */
     .article-header {
         display: flex;
         flex-direction: column;
@@ -31,7 +30,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        /* CENTERED */
         gap: 12px;
         color: var(--accent);
         font-size: 0.85rem;
@@ -52,10 +50,8 @@
         margin: 0;
         hyphens: none;
         text-align: center;
-        /* CENTERED */
     }
 
-    /* Header Footer for the stats */
     .header-actions {
         display: flex;
         justify-content: space-between;
@@ -81,15 +77,12 @@
         border: 1px solid var(--border);
     }
 
-    /* --- NEW STATS AREA --- */
     .stats-group {
         display: flex;
         align-items: center;
         gap: 24px;
-        /* Spacing between Views and Like Button */
     }
 
-    /* View Counter (Professional Look) */
     .view-counter {
         display: flex;
         align-items: center;
@@ -105,7 +98,6 @@
         opacity: 0.6;
     }
 
-    /* Like Button (Distinct Interactive Element) */
     .like-btn {
         display: flex;
         align-items: center;
@@ -308,8 +300,7 @@
 </style>
 
 <div class="article-wrapper">
-    <!-- Top Back Link -->
-    <a href="/" class="back-link">← Back to Logs</a>
+    <a href="/" class="back-link">← Back to Home</a>
 
     <article class="article-container">
         <header class="article-header">
@@ -354,7 +345,6 @@
             {{ .Body }}
         </div>
 
-        <!-- NEW FOOTER SECTION -->
         <footer class="article-footer">
             <div class="footer-divider"></div>
             <a href="/" class="footer-home-link">

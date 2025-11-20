@@ -153,11 +153,17 @@ func main() {
 		log.Fatal(err)
 	}
 	f.Close()
+
 	log.Println("Generated: public/index.html")
 
 	for _, post := range posts {
-		filename := "public/" + post.Slug + ".html"
-		f, err := os.Create(filename)
+		dirPath := filepath.Join("public", post.Slug)
+		if err := os.MkdirAll(dirPath, 0755); err != nil {
+			log.Fatal(err)
+		}
+
+		filePath := filepath.Join(dirPath, "index.html")
+		f, err := os.Create(filePath)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -166,6 +172,6 @@ func main() {
 			log.Fatal(err)
 		}
 		f.Close()
-		log.Println("Generated:", filename)
+		log.Println("Generated:", filePath)
 	}
 }
