@@ -409,7 +409,7 @@
 <body>
 
     <header>
-        <div class="brand">THORN HALL.</div>
+        <div class="brand">Thorn Hall</div>
         <nav class="nav-links">
             <a href="/">Articles</a>
             <a href="/about">About</a>
@@ -473,7 +473,7 @@
 
         async function fetchStats(slug) {
             const CACHE_KEY = `stats_cache_${slug}`;
-            const COOLDOWN = 60000 * 10; // 10 minutes
+            const COOLDOWN = 60000 * 2; // 2 minutes
             const now = Date.now();
 
             // A. Check Cache Validity
