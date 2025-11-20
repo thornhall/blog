@@ -128,7 +128,6 @@
         transition: fill 0.2s ease;
     }
 
-    /* Clicked State */
     .like-btn.liked {
         border-color: #ef4444;
         color: #ef4444;
@@ -140,7 +139,6 @@
         stroke: #ef4444;
     }
 
-    /* --- TYPOGRAPHY --- */
     .prose {
         color: #d4d4d8;
         font-size: 1.15rem;
@@ -150,6 +148,54 @@
 
     .prose p {
         margin-bottom: 2em;
+    }
+
+    .prose ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 2em 0;
+    }
+
+    .prose li {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 1em;
+        color: var(--text-muted);
+    }
+
+    .prose ul li::before {
+        content: "›";
+        position: absolute;
+        left: 0;
+        top: -2px;
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 1.4em;
+        line-height: 1.5;
+        text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .prose ol {
+        list-style: none;
+        counter-reset: item;
+        padding-left: 0;
+        margin: 2em 0;
+    }
+
+    .prose ol li {
+        counter-increment: item;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 1em;
+    }
+
+    .prose ol li::before {
+        content: counter(item) ".";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        font-family: var(--font-display);
+        font-weight: 700;
     }
 
     .prose img,
@@ -177,7 +223,7 @@
         border-radius: 4px;
         font-family: 'Courier New', monospace;
         color: var(--accent);
-        font-size: 1em;
+        font-size: 0.9em;
         border: 1px solid rgba(41, 41, 41, 0.2);
         word-break: break-all;
     }
