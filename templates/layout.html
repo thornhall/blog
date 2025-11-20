@@ -473,7 +473,7 @@
 
         async function fetchStats(slug) {
             const CACHE_KEY = `stats_cache_${slug}`;
-            const COOLDOWN = 60000; // 1 Minute
+            const COOLDOWN = 60000 * 10; // 10 minutes
             const now = Date.now();
 
             // A. Check Cache Validity
