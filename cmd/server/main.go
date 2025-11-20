@@ -31,7 +31,7 @@ func NewServer(publicDir, domain string) *http.Server {
 
 		certManager := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
-			HostPolicy: autocert.HostWhitelist(domain),
+			HostPolicy: autocert.HostWhitelist(domain, "www."+domain),
 			Cache:      autocert.DirCache("certs"),
 		}
 
