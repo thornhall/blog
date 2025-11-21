@@ -30,6 +30,7 @@ go.work.sum
 .DS_Store
 public/*
 !public/.gitkeep
+blog.db*
 
 # Editor/IDE
 # .idea/
