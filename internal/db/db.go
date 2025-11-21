@@ -15,7 +15,7 @@ type DB interface {
 
 // Creates and returns a new DB, exiting if it fails to do so.
 func New() *sql.DB {
-	db, err := sql.Open("sqlite", "./blog.db")
+	db, err := sql.Open("sqlite", "file:./blog.db?_journal_mode=WAL&_busy_timeout=5000")
 	if err != nil {
 		log.Fatal(err)
 	}
