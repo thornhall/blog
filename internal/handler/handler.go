@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"net"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/thornhall/blog/internal/repo"
 )
@@ -25,6 +27,47 @@ func New(repo *repo.Repo, log *slog.Logger, publicDir string) *Handler {
 	}
 }
 
+// GetClientIP extracts the IP and immediately normalizes it.
+func GetClientIP(r *http.Request) string {
+	// 1. Check Cloudflare/Proxy Header
+	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+		// XFF can be "client, proxy1, proxy2". We want the first one.
+		ips := strings.Split(xff, ",")
+		return NormalizeIP(strings.TrimSpace(ips[0]))
+	}
+
+	// 2. Check Nginx/Standard Proxy Header
+	if xrip := r.Header.Get("X-Real-IP"); xrip != "" {
+		return NormalizeIP(xrip)
+	}
+
+	// 3. Fallback to Direct Connection
+	return NormalizeIP(r.RemoteAddr)
+}
+
+func NormalizeIP(address string) string {
+	host, _, err := net.SplitHostPort(address)
+	if err == nil {
+		address = host
+	}
+
+	ip := net.ParseIP(address)
+	if ip == nil {
+		return ""
+	}
+
+	// IPv4: Return as-is
+	if ip4 := ip.To4(); ip4 != nil {
+		return ip4.String()
+	}
+
+	// IPv6: Mask to the /64 subnet
+	mask := net.CIDRMask(64, 128)
+	maskedIP := ip.Mask(mask)
+
+	return maskedIP.String()
+}
+
 var slugRegex = regexp.MustCompile(`^[a-z0-9-]+$`)
 
 func isValidSlug(slug string) bool {
@@ -35,7 +78,6 @@ type ErrorResponse struct {
 	Message string `json:"error"`
 }
 
-// Used for all error responses for consistency.
 func HttpErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	res := ErrorResponse{Message: message}
 	w.Header().Set("Content-Type", "application/json")
@@ -45,15 +87,42 @@ func HttpErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 
 func (h *Handler) HandleGetStats(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
-
 	if !isValidSlug(slug) {
 		HttpErrorResponse(w, "invalid slug format", http.StatusBadRequest)
 		return
 	}
 
-	stats, err := h.repo.IncrementViews(r.Context(), slug)
+	stats, err := h.repo.GetStats(r.Context(), slug)
 	if err != nil {
-		h.log.Error("error incrementing views", "error", err, "slug", slug)
+		if errors.Is(err, sql.ErrNoRows) {
+			json.NewEncoder(w).Encode(repo.Stats{Slug: slug, Views: 0, Likes: 0})
+			return
+		}
+		h.log.Error("error getting stats", "error", err)
+		HttpErrorResponse(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(stats)
+}
+
+func (h *Handler) HandleView(w http.ResponseWriter, r *http.Request) {
+	slug := r.PathValue("slug")
+	if !isValidSlug(slug) {
+		HttpErrorResponse(w, "invalid slug format", http.StatusBadRequest)
+		return
+	}
+
+	ip := GetClientIP(r)
+	if ip == "" {
+		HttpErrorResponse(w, "invalid request ip", http.StatusBadRequest)
+		return
+	}
+
+	stats, err := h.repo.IncrementViews(r.Context(), ip, slug)
+	if err != nil {
+		h.log.Error("error incrementing view", "error", err, "slug", slug)
 		HttpErrorResponse(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -69,12 +138,14 @@ func (h *Handler) HandleLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stats, err := h.repo.IncrementLikes(r.Context(), slug)
+	ip := GetClientIP(r)
+	if ip == "" {
+		HttpErrorResponse(w, "invalid request ip", http.StatusBadRequest)
+		return
+	}
+
+	stats, err := h.repo.IncrementLikes(r.Context(), ip, slug)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			HttpErrorResponse(w, "post not found", http.StatusNotFound)
-			return
-		}
 		h.log.Error("error liking post", "error", err)
 		HttpErrorResponse(w, "internal server error", http.StatusInternalServerError)
 		return

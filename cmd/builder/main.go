@@ -119,6 +119,11 @@ func main() {
 			return ""
 		}
 
+		slug := getString("slug")
+		if slug == "" {
+			log.Fatalf("CRITICAL ERROR: File '%s' has no slug (or frontmatter failed to parse). Stopping to protect index.html.", file.Name())
+		}
+
 		p := Post{
 			Title:    getString("title"),
 			Slug:     getString("slug"),

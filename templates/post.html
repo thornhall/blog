@@ -455,4 +455,22 @@
     </article>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const slug = "{{ .Slug }}";
+
+        fetch(`/api/views/${slug}`, { method: 'POST' })
+            .then(response => {
+                if (response.ok) return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    const viewSpan = document.getElementById(`views-${slug}`);
+                    if (viewSpan) viewSpan.innerText = data.views_count;
+                }
+            })
+            .catch(console.error);
+    });
+</script>
+
 {{ end }}

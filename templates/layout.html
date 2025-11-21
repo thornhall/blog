@@ -432,7 +432,7 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        window.addEventListener("pageshow", () => {
             const container = document.getElementById("cards-container");
             if (container && window.matchMedia("(hover: hover)").matches) {
                 container.onmousemove = e => {
@@ -449,39 +449,23 @@
             const viewElements = document.querySelectorAll('[id^="views-"]');
             viewElements.forEach(el => {
                 const slug = el.id.replace('views-', '');
+
                 const isLiked = localStorage.getItem(`liked_${slug}`);
                 if (isLiked) {
                     const btn = document.querySelector(`button[onclick="handleLike('${slug}')"]`);
                     if (btn) btn.classList.add('liked');
                 }
+
                 fetchStats(slug);
             });
         });
 
         async function fetchStats(slug) {
-            const CACHE_KEY = `stats_cache_${slug}`;
-            const COOLDOWN = 60000 * 2;
-            const now = Date.now();
-
-            const cached = localStorage.getItem(CACHE_KEY);
-            if (cached) {
-                const data = JSON.parse(cached);
-                if (now - data.timestamp < COOLDOWN) {
-                    updateStatsUI(slug, data.views, data.likes);
-                    return;
-                }
-            }
-
             try {
                 const res = await fetch(`/api/stats/${slug}`);
                 if (!res.ok) return;
                 const data = await res.json();
                 updateStatsUI(slug, data.views_count, data.likes_count);
-                localStorage.setItem(CACHE_KEY, JSON.stringify({
-                    views: data.views_count,
-                    likes: data.likes_count,
-                    timestamp: now
-                }));
             } catch (e) {
                 console.error("Failed to hydrate stats", e);
             }
@@ -500,6 +484,7 @@
             try {
                 const btn = document.querySelector(`button[onclick="handleLike('${slug}')"]`);
                 const countSpan = document.getElementById(`likes-${slug}`);
+
                 let current = parseInt(countSpan.innerText.replace(/,/g, ''));
                 countSpan.innerText = current + 1;
                 btn.classList.add('liked');
@@ -510,13 +495,6 @@
 
                 const data = await res.json();
                 countSpan.innerText = data.likes_count;
-
-                const CACHE_KEY = `stats_cache_${slug}`;
-                localStorage.setItem(CACHE_KEY, JSON.stringify({
-                    views: data.views_count,
-                    likes: data.likes_count,
-                    timestamp: Date.now()
-                }));
             } catch (e) {
                 console.error("Like failed", e);
             }

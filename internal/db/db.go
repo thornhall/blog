@@ -23,14 +23,38 @@ func New() *sql.DB {
 	return db
 }
 
-// Initializes our lightweight table post_stats, exiting on failure.
 func initDB(db *sql.DB) {
 	query := `CREATE TABLE IF NOT EXISTS post_stats (
 		slug TEXT PRIMARY KEY, 
 		views INTEGER DEFAULT 0, 
 		likes INTEGER DEFAULT 0
 	);`
+
+	query2 := `CREATE TABLE IF NOT EXISTS ip_likes (
+		ip TEXT,
+		post_slug TEXT REFERENCES post_stats(slug),
+
+		PRIMARY KEY (ip, post_slug)
+	);`
+
+	query3 := `CREATE TABLE IF NOT EXISTS ip_views (
+		ip TEXT,
+		post_slug TEXT REFERENCES post_stats(slug),
+
+		PRIMARY KEY (ip, post_slug)
+	);`
+
 	_, err := db.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec(query2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec(query3)
 	if err != nil {
 		log.Fatal(err)
 	}

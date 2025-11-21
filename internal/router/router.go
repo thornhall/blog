@@ -12,6 +12,7 @@ func New(h *handler.Handler, log *slog.Logger, publicDir string) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/likes/{slug}", h.HandleLike)
 	mux.HandleFunc("GET /api/stats/{slug}", h.HandleGetStats)
+	mux.HandleFunc("POST /api/views/{slug}", h.HandleView)
 	fs := http.FileServer(http.Dir(publicDir))
 	assetsFs := http.FileServer(http.Dir("./assets"))
 	mux.Handle("GET /assets/", http.StripPrefix("/assets/", assetsFs))

@@ -30,6 +30,28 @@ func setupTestDB() {
 	if _, err := db.Exec(query); err != nil {
 		log.Fatalf("failed to create tables: %v", err)
 	}
+
+	query2 := `CREATE TABLE IF NOT EXISTS ip_likes (
+		ip TEXT,
+		post_slug TEXT REFERENCES post_stats(slug),
+
+		PRIMARY KEY (ip, post_slug)
+	);`
+
+	if _, err := db.Exec(query2); err != nil {
+		log.Fatalf("failed to create tables: %v", err)
+	}
+
+	query3 := `CREATE TABLE IF NOT EXISTS ip_views (
+		ip TEXT,
+		post_slug TEXT REFERENCES post_stats(slug),
+
+		PRIMARY KEY (ip, post_slug)
+	);`
+
+	if _, err := db.Exec(query3); err != nil {
+		log.Fatalf("failed to create tables: %v", err)
+	}
 }
 
 func TestMain(m *testing.M) {
@@ -40,39 +62,61 @@ func TestMain(m *testing.M) {
 }
 
 func TestLikes(t *testing.T) {
-	txn, err := db.Begin()
-	assert.NoError(t, err)
-	defer txn.Rollback()
-
-	r := repo.New(txn)
-	stats, err := r.IncrementViews(t.Context(), "random-slug")
+	r := repo.New(db)
+	stats, err := r.GetStats(t.Context(), "random-slug")
 	assert.NoError(t, err)
 	assert.Equal(t, "random-slug", stats.Slug)
-	assert.Equal(t, 1, stats.Views)
+	assert.Equal(t, 0, stats.Views)
 	assert.Equal(t, 0, stats.Likes)
 
-	stats, err = r.IncrementLikes(t.Context(), "random-slug")
+	stats, err = r.IncrementLikes(t.Context(), "randomip", "random-slug")
 	assert.NoError(t, err)
 	assert.Equal(t, "random-slug", stats.Slug)
 	assert.Equal(t, 1, stats.Likes)
-	assert.Equal(t, 1, stats.Views)
+	assert.Equal(t, 0, stats.Views)
 }
 
 func TestViews(t *testing.T) {
-	txn, err := db.Begin()
-	assert.NoError(t, err)
-	defer txn.Rollback()
-
-	r := repo.New(txn)
-	stats, err := r.IncrementViews(t.Context(), "random-slug")
+	r := repo.New(db)
+	stats, err := r.GetStats(t.Context(), "random-slug")
 	assert.NoError(t, err)
 	assert.Equal(t, "random-slug", stats.Slug)
+	assert.Equal(t, 0, stats.Views)
+	assert.Equal(t, 0, stats.Likes)
+
+	stats, err = r.IncrementViews(t.Context(), "randomip", "random-slug")
+	assert.NoError(t, err)
 	assert.Equal(t, 1, stats.Views)
-	assert.Equal(t, 0, stats.Likes)
+}
 
-	stats, err = r.IncrementViews(t.Context(), "random-slug")
+func TestIsLiked(t *testing.T) {
+	r := repo.New(db)
+
+	stats, err := r.GetStats(t.Context(), "random-slug")
 	assert.NoError(t, err)
-	assert.Equal(t, "random-slug", stats.Slug)
-	assert.Equal(t, 2, stats.Views)
-	assert.Equal(t, 0, stats.Likes)
+	assert.Equal(t, 0, stats.Views)
+
+	stats, err = r.IncrementLikes(t.Context(), "randomip2", "random-slug")
+	assert.NoError(t, err)
+	assert.Equal(t, 1, stats.Likes)
+
+	stats, err = r.IncrementLikes(t.Context(), "randomip2", "random-slug")
+	assert.NoError(t, err)
+	assert.Equal(t, 1, stats.Likes)
+}
+
+func TestIsViewed(t *testing.T) {
+	r := repo.New(db)
+
+	stats, err := r.GetStats(t.Context(), "random-slug")
+	assert.NoError(t, err)
+	assert.Equal(t, 0, stats.Views)
+
+	stats, err = r.IncrementViews(t.Context(), "randomip3", "random-slug")
+	assert.NoError(t, err)
+	assert.Equal(t, 1, stats.Views)
+
+	stats, err = r.IncrementViews(t.Context(), "randomip3", "random-slug")
+	assert.NoError(t, err)
+	assert.Equal(t, 1, stats.Views)
 }
