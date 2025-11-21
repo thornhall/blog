@@ -78,7 +78,7 @@ func main() {
 			meta.Meta,
 			highlighting.NewHighlighting(
 				highlighting.WithStyle("custom-vscode"),
-				highlighting.WithFormatOptions(html.WithLineNumbers(true)),
+				highlighting.WithFormatOptions(html.WithLineNumbers(true), html.TabWidth(4)),
 			),
 		),
 		goldmark.WithParserOptions(
