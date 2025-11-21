@@ -1,6 +1,10 @@
 {{ define "content" }}
 
 <style>
+    .layout {
+        grid-template-columns: minmax(0, 1fr) 240px !important;
+    }
+
     .article-wrapper {
         width: 100%;
         margin: 0 auto;
@@ -13,7 +17,6 @@
         padding: 50px;
         position: relative;
         overflow: hidden;
-
         word-break: break-word;
         overflow-wrap: break-word;
     }
@@ -152,15 +155,15 @@
 
     .prose ul {
         list-style: none;
-        padding-left: 0;
+        padding-left: 1.5em;
         margin: 2em 0;
     }
 
     .prose ul li {
         position: relative;
-        padding-left: 2em;
+        padding-left: 2.5em;
         margin-bottom: 1em;
-        color: var(--text-muted);
+        color: var(--text-main);
         line-height: 1.7;
     }
 
@@ -185,16 +188,16 @@
     .prose ol {
         list-style: none;
         counter-reset: item;
-        padding-left: 0;
+        padding-left: 1.5em;
         margin: 2em 0;
     }
 
     .prose ol li {
         counter-increment: item;
         position: relative;
-        padding-left: 3em;
+        padding-left: 3.5em;
         margin-bottom: 1.2em;
-        color: var(--text-muted);
+        color: var(--text-main);
     }
 
     .prose ol li::before {
@@ -202,12 +205,10 @@
         position: absolute;
         left: 0;
         top: 0;
-
         font-family: var(--font-display);
         font-weight: 700;
         font-size: 0.85rem;
         color: var(--accent);
-
         background: rgba(89, 244, 255, 0.1);
         border: 1px solid rgba(89, 244, 255, 0.2);
         min-width: 24px;
@@ -253,15 +254,34 @@
         border: 1px solid var(--border);
         margin: 2em 0;
         box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-        white-space: pre-wrap;
-        word-wrap: break-word;
         max-width: 100%;
         font-size: 1rem;
         line-height: 1.5;
-        overflow-x: auto;
         white-space: pre;
+        overflow-x: auto;
         word-wrap: normal;
         overflow-wrap: normal;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+        font-family: var(--font-display);
+    }
+
+    .prose pre::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .prose pre::-webkit-scrollbar-track {
+        background: #0e0e10;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .prose pre::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+    }
+
+    .prose pre::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
     }
 
     .prose pre code {
@@ -269,7 +289,11 @@
         padding: 0;
         color: inherit;
         border: none;
+        white-space: pre;
         word-break: normal;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+        font-family: inherit;
     }
 
     .prose blockquote {
@@ -281,7 +305,6 @@
         text-align: center;
         line-height: 1.4;
     }
-
 
     .back-link {
         display: inline-flex;
@@ -359,9 +382,27 @@
         .prose pre {
             padding: 15px;
         }
+
+        .prose ul,
+        .prose ol {
+            padding-left: 0;
+        }
+
+        .prose ul li {
+            padding-left: 1.5em;
+        }
+
+        .prose ol li {
+            padding-left: 2.5em;
+        }
     }
 
     @media (min-width: 900px) {
+
+        .layout {
+            grid-template-columns: minmax(0, 1fr) 240px !important;
+        }
+
         .sidebar {
             margin-top: 64px;
         }
