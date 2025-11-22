@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
+	"time"
 
 	"github.com/alecthomas/chroma/v2"
 	"github.com/alecthomas/chroma/v2/formatters/html"
@@ -136,6 +138,18 @@ func main() {
 
 		posts = append(posts, p)
 	}
+
+	sort.Slice(posts, func(i, j int) bool {
+		layout := "Jan 02, 2006"
+
+		t1, err1 := time.Parse(layout, posts[i].Date)
+		t2, err2 := time.Parse(layout, posts[j].Date)
+
+		if err1 != nil || err2 != nil {
+			return false
+		}
+		return t1.After(t2)
+	})
 
 	data := PageData{
 		Title:   "blog.info()",

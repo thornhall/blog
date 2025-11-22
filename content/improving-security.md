@@ -1,7 +1,7 @@
 ---
 title: Improving the Security of the Blog
 slug: improving-security
-date: Nov 20, 2025
+date: Nov 21, 2025
 category: Engineering
 excerpt: A lesson learned.
 ---
