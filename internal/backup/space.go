@@ -18,6 +18,9 @@ type SpaceClient struct {
 }
 
 func NewSpaceClient() (*SpaceClient, error) {
+	if os.Getenv("ENV") != "prod" {
+		return nil, fmt.Errorf("environment is not prod - not configuring backups")
+	}
 	key := os.Getenv("SPACES_KEY")
 	secret := os.Getenv("SPACES_SECRET")
 	endpoint := os.Getenv("SPACES_ENDPOINT")
