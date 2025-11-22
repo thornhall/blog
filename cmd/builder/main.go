@@ -44,6 +44,7 @@ func init() {
 		chroma.String:      "#f5ce42",
 		chroma.StringChar:  "#f5ce42",
 		chroma.LiteralDate: "#f5ce42",
+		chroma.Generic:     "#44e7f9",
 
 		chroma.Number:          "#f5ce42",
 		chroma.KeywordConstant: "#f5ce42 bold",

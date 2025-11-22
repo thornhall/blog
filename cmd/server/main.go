@@ -11,11 +11,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/thornhall/blog/internal/backup"
 	"github.com/thornhall/blog/internal/db"
 	"github.com/thornhall/blog/internal/handler"
 	"github.com/thornhall/blog/internal/logging"
 	"github.com/thornhall/blog/internal/repo"
 	"github.com/thornhall/blog/internal/router"
+	"github.com/thornhall/blog/internal/tasks"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -86,12 +88,24 @@ func main() {
 		}
 	}()
 
+	backupCtx, cancelBackup := context.WithCancel(context.Background())
+	defer cancelBackup()
+
+	backupClient, err := backup.NewSpaceClient()
+	if err != nil {
+		log.Printf("error getting S3 client: %v", err)
+	} else {
+		backupWorker := tasks.NewBackupService(backupClient, "blog.db", time.Hour)
+		backupWorker.Start(backupCtx)
+	}
+
 	shutDownChan := make(chan os.Signal, 1)
 	signal.Notify(shutDownChan, syscall.SIGINT, syscall.SIGTERM)
 	<-shutDownChan
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	cancelBackup()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Fatalf("unable to shutdown server gracefully: %v", err)
