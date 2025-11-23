@@ -388,6 +388,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            justify-content: flex-end;
+            gap: 40px;
             z-index: 1000;
             backdrop-filter: blur(5px);
         }
@@ -552,11 +554,6 @@
 
     </div>
     <footer class="sys-footer">
-        <div class="sys-item">
-            <div id="sys-status" class="status-light"></div>
-            <span style="margin-left: 8px; letter-spacing: 1px;">SYSTEM.ONLINE</span>
-        </div>
-
         <div class="sys-stat-group">
             <div class="sys-item">
                 <span class="sys-label">UPTIME:</span>
@@ -574,6 +571,11 @@
                 <span class="sys-label">DB_SIZE:</span>
                 <span class="sys-value" id="stat-db">--</span> MB
             </div>
+        </div>
+
+        <div class="sys-item">
+            <div id="sys-status" class="status-light"></div>
+            <span style="margin-left: 8px; letter-spacing: 1px;">SYSTEM.ONLINE</span>
         </div>
     </footer>
     <script>
