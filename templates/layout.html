@@ -443,18 +443,40 @@
 
         @media (max-width: 600px) {
             .sys-footer {
-                flex-direction: column;
-                gap: 5px;
-                padding: 10px;
-                position: static;
-                margin-top: 40px;
-                text-align: center;
+                position: fixed;
+                bottom: 0;
+                margin-top: 0;
+                width: 100%;
+
+                flex-direction: row;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+
+                overflow-x: auto;
+                gap: 20px;
+                padding: 10px 15px;
+
+
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+
+                background: rgba(10, 10, 12, 0.98);
+                border-top: 1px solid var(--border);
+            }
+
+            .sys-footer::-webkit-scrollbar {
+                display: none;
             }
 
             .sys-stat-group {
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 15px;
+                flex-wrap: nowrap;
+                gap: 20px;
+                padding-right: 20px;
+            }
+
+            .sys-item {
+                white-space: nowrap;
+                font-size: 0.45rem;
             }
         }
 
