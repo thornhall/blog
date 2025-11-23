@@ -183,7 +183,7 @@ func (h *Handler) HandleStreamStats(w http.ResponseWriter, r *http.Request) {
 
 	flusher.Flush()
 
-	ticker := time.NewTicker(2 * time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
 	sendStats := func() error {
