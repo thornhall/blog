@@ -374,6 +374,90 @@
             color: var(--accent);
         }
 
+        .sys-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 12, 0.95);
+            border-top: 1px solid var(--border);
+            padding: 8px 20px;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .sys-stat-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .sys-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sys-label {
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .sys-value {
+            color: var(--accent);
+        }
+
+        .status-light {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: blink 2s infinite;
+        }
+
+        .status-light.offline {
+            background-color: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            animation: none;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sys-footer {
+                flex-direction: column;
+                gap: 5px;
+                padding: 10px;
+                position: static;
+                margin-top: 40px;
+                text-align: center;
+            }
+
+            .sys-stat-group {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+        }
+
         @media (max-width: 900px) {
             .layout {
                 grid-template-columns: minmax(0, 1fr);
@@ -445,8 +529,51 @@
         </aside>
 
     </div>
+    <footer class="sys-footer">
+        <div class="sys-item">
+            <div id="sys-status" class="status-light"></div>
+            <span style="margin-left: 8px; letter-spacing: 1px;">SYSTEM.ONLINE</span>
+        </div>
 
+        <div class="sys-stat-group">
+            <div class="sys-item">
+                <span class="sys-label">UPTIME:</span>
+                <span class="sys-value" id="stat-uptime">--</span>
+            </div>
+            <div class="sys-item">
+                <span class="sys-label">MEM:</span>
+                <span class="sys-value" id="stat-mem">--</span> MB
+            </div>
+            <div class="sys-item">
+                <span class="sys-label">ROUTINES:</span>
+                <span class="sys-value" id="stat-routines">--</span>
+            </div>
+            <div class="sys-item">
+                <span class="sys-label">DB_SIZE:</span>
+                <span class="sys-value" id="stat-db">--</span> MB
+            </div>
+        </div>
+    </footer>
     <script>
+        if (!!window.EventSource) {
+            const source = new EventSource('/api/streams/stats');
+            const statusLight = document.getElementById('sys-status');
+
+            source.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+
+                document.getElementById('stat-uptime').innerText = data.uptime;
+                document.getElementById('stat-mem').innerText = data.memory_mb;
+                document.getElementById('stat-routines').innerText = data.goroutines;
+                document.getElementById('stat-db').innerText = data.db_size;
+
+                if (statusLight) statusLight.classList.remove('offline');
+            };
+
+            source.onerror = function (e) {
+                if (statusLight) statusLight.classList.add('offline');
+            };
+        }
         window.addEventListener("pageshow", () => {
             const container = document.getElementById("cards-container");
             if (container && window.matchMedia("(hover: hover)").matches) {

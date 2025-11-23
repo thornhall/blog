@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,7 +22,7 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
-func NewServer(publicDir, domain string) *http.Server {
+func NewServer(ctx context.Context, publicDir, domain string) *http.Server {
 	logger := logging.New(os.Stdout)
 	database := db.New()
 	rep := repo.New(database)
@@ -56,8 +57,12 @@ func NewServer(publicDir, domain string) *http.Server {
 				MinVersion:     tls.VersionTLS12,
 			},
 			ReadTimeout:       10 * time.Second,
-			WriteTimeout:      5 * time.Second,
+			IdleTimeout:       120 * time.Second,
+			WriteTimeout:      0,
 			ReadHeaderTimeout: 5 * time.Second,
+			BaseContext: func(l net.Listener) context.Context {
+				return ctx
+			},
 		}
 	}
 
@@ -66,14 +71,21 @@ func NewServer(publicDir, domain string) *http.Server {
 		Addr:              ":8080",
 		Handler:           mux,
 		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      5 * time.Second,
+		IdleTimeout:       120 * time.Second,
+		WriteTimeout:      0,
 		ReadHeaderTimeout: 5 * time.Second,
+		BaseContext: func(l net.Listener) context.Context {
+			return ctx
+		},
 	}
 }
 
 func main() {
+	engineCtx, cancelEngine := context.WithCancel(context.Background())
+	defer cancelEngine()
+
 	domain := os.Getenv("DOMAIN")
-	srv := NewServer("./public", domain)
+	srv := NewServer(engineCtx, "./public", domain)
 
 	go func() {
 		var err error
@@ -106,6 +118,7 @@ func main() {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	cancelBackup()
+	cancelEngine()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Fatalf("unable to shutdown server gracefully: %v", err)

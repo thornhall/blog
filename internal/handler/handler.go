@@ -4,11 +4,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
+	"os"
 	"regexp"
+	"runtime"
 	"strings"
+	"time"
 
 	"github.com/thornhall/blog/internal/repo"
 )
@@ -153,4 +157,77 @@ func (h *Handler) HandleLike(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stats)
+}
+
+var StartTime = time.Now()
+
+type SysStats struct {
+	Uptime     string `json:"uptime"`
+	MemoryMB   uint64 `json:"memory_mb"`
+	Goroutines int    `json:"goroutines"`
+	DbSizeMB   string `json:"db_size"`
+}
+
+func (h *Handler) HandleStreamStats(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("X-Accel-Buffering", "no")
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
+		return
+	}
+
+	flusher.Flush()
+
+	ticker := time.NewTicker(2 * time.Second)
+	defer ticker.Stop()
+
+	sendStats := func() error {
+		var m runtime.MemStats
+		runtime.ReadMemStats(&m)
+
+		var dbSizeStr string
+		fileInfo, err := os.Stat("./blog.db")
+		if err == nil {
+			dbSizeStr = fmt.Sprintf("%.2f", float64(fileInfo.Size())/1024/1024)
+		} else {
+			dbSizeStr = "0.00"
+		}
+
+		stats := SysStats{
+			Uptime:     time.Since(StartTime).Round(time.Second).String(),
+			MemoryMB:   m.Alloc / 1024 / 1024,
+			Goroutines: runtime.NumGoroutine(),
+			DbSizeMB:   dbSizeStr,
+		}
+
+		data, _ := json.Marshal(stats)
+
+		_, err = fmt.Fprintf(w, "data: %s\n\n", data)
+		if err != nil {
+			return err
+		}
+
+		flusher.Flush()
+		return nil
+	}
+
+	if err := sendStats(); err != nil {
+		return
+	}
+
+	for {
+		select {
+		case <-r.Context().Done():
+			return
+		case <-ticker.C:
+			if err := sendStats(); err != nil {
+				return
+			}
+		}
+	}
 }
